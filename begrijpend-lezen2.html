@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Begrijpend Lezen — Groep 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f2eb;
+    --bg2: #ede9df;
+    --bg3: #e4dfd3;
+    --ink: #1e1c18;
+    --ink2: #5a5549;
+    --ink3: #8a8478;
+    --accent: #2d6a4f;
+    --accent2: #52b788;
+    --accent-light: #d8f3dc;
+    --warn: #b5451b;
+    --warn-light: #fde8e0;
+    --gold: #c77d3e;
+    --gold-light: #fdf0e0;
+    --border: rgba(30,28,24,0.12);
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(30,28,24,0.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent2); }
+  .header-meta { font-size: 0.8rem; color: rgba(245,242,235,0.5); }
+
+  /* ── Layout ── */
+  .shell {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ── Set selector ── */
+  .set-picker {
+    margin-bottom: 2.5rem;
+  }
+  .set-picker h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.02em;
+  }
+  .set-picker p {
+    color: var(--ink2);
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+  .set-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .set-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+    user-select: none;
+  }
+  .set-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .set-card.active { border-color: var(--accent); background: var(--accent-light); }
+  .set-card .set-label { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 4px; }
+  .set-card .set-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .set-card .set-desc { font-size: 0.8rem; color: var(--ink2); }
+  .set-card .set-meta { font-size: 0.75rem; color: var(--ink3); margin-top: 8px; }
+
+  /* ── Quiz area ── */
+  #quiz-area { display: none; }
+  #quiz-area.visible { display: block; }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label { font-size: 0.8rem; color: var(--ink2); white-space: nowrap; }
+
+  /* ── Question card ── */
+  .q-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: slidein 0.25s ease;
+  }
+  @keyframes slidein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .q-header {
+    padding: 1rem 1.5rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .level-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+  .lv1 { background: #d8f3dc; color: #1b4332; }
+  .lv2 { background: #dbeafe; color: #1e3a5f; }
+  .lv3 { background: #fef3c7; color: #78350f; }
+  .lv4 { background: #fde8e0; color: #7c2d12; }
+  .type-label { font-size: 0.75rem; color: var(--ink2); font-style: italic; }
+
+  .reading-text {
+    padding: 1.25rem 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
+    background: #fafaf8;
+  }
+  .reading-text em { font-style: italic; color: var(--ink2); }
+  .reading-text strong { font-weight: 500; }
+
+  .q-body { padding: 1.25rem 1.5rem; }
+
+  .question-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+  .opt {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--ink);
+    transition: background 0.12s, border-color 0.12s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .opt:hover:not(:disabled) { background: var(--bg2); border-color: var(--ink3); }
+  .opt:disabled { cursor: default; }
+  .opt .opt-key {
+    font-size: 0.75rem;
+    font-weight: 500;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg3);
+    color: var(--ink2);
+    margin-top: 1px;
+    transition: background 0.12s, color 0.12s;
+  }
+  .opt.correct { background: var(--accent-light); border-color: var(--accent); }
+  .opt.correct .opt-key { background: var(--accent); color: white; }
+  .opt.wrong { background: var(--warn-light); border-color: var(--warn); }
+  .opt.wrong .opt-key { background: var(--warn); color: white; }
+
+  /* ── Feedback ── */
+  .feedback {
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--accent-light); color: #1b4332; border: 1px solid #b7e4c7; }
+  .feedback.nok { background: var(--warn-light); color: #7c2d12; border: 1px solid #fca5a5; }
+  .fb-icon { font-weight: 600; margin-right: 4px; }
+
+  /* ── Nav row ── */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; }
+  .q-counter { font-size: 0.8rem; color: var(--ink2); }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.55rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--ink);
+    color: var(--bg);
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: none;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.show { display: inline-flex; align-items: center; gap: 6px; }
+  .btn-secondary {
+    background: white;
+    color: var(--ink);
+    border-color: var(--border);
+  }
+
+  /* ── Score screen ── */
+  .score-screen {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    animation: slidein 0.3s ease;
+  }
+  .score-big {
+    font-family: 'Fraunces', serif;
+    font-size: 4rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .score-sub { font-size: 0.9rem; color: var(--ink2); margin-bottom: 0.5rem; }
+  .score-msg { font-size: 1rem; color: var(--ink); margin-bottom: 2rem; }
+  .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-score {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-score:hover { opacity: 0.8; }
+  .btn-score.primary { background: var(--ink); color: var(--bg); }
+  .btn-score.secondary { background: white; color: var(--ink); }
+
+  /* ── Star row ── */
+  .stars { font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: 4px; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    color: var(--ink3);
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+
+  @media (max-width: 540px) {
+    .shell { padding: 1.5rem 1rem 3rem; }
+    header { padding: 0 1rem; }
+    .q-header, .q-body, .reading-text { padding: 1rem; }
+    .score-big { font-size: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Lees<span>slim</span></div>
+  <div class="header-meta">Begrijpend lezen · Groep 6</div>
+</header>
+
+<div class="shell">
+
+  <!-- Set picker -->
+  <div class="set-picker" id="set-picker">
+    <h2>Kies een oefenset</h2>
+    <p>Elke set bevat 6 vragen van makkelijk naar moeilijk, op AVI E6/M6 niveau.</p>
+    <div class="set-grid" id="set-grid"></div>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz-area">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+      <div class="progress-label" id="prog-label">0 / 6</div>
+    </div>
+    <div id="qbody"></div>
+  </div>
+
+</div>
+
+<footer>Leessslim · Oefenplatform begrijpend lezen groep 6 · Alle vragen zijn op AVI E6/M6 niveau</footer>
+
+<script>
+const SETS = [
+  {
+    id: "natuur",
+    label: "Set 1",
+    title: "Natuur & dieren",
+    desc: "Zeeschildpadden, insecten en de woestijn",
+    vragen: 6,
+    questions: [
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Informatieve tekst",
+        text:`De <strong>zeeschildpad</strong> is een bijzonder dier. Ze leven bijna hun hele leven in zee, maar de vrouwtjes kruipen toch een keer per jaar het strand op. Dan graven ze een kuil in het zand en leggen ze wel honderd eieren tegelijk. Daarna keren ze terug naar zee. Na een paar weken komen de kleine schildpadjes uit de eieren gekropen. Ze zoeken meteen hun weg naar het water, geleid door het maanlicht. Niet alle schildpadjes halen het: zeemeeuwen en krabben zijn altijd op zoek naar een gemakkelijke maaltijd. Van de honderd eitjes worden er misschien maar twee of drie volwassen schildpadden.`,
+        q:"Hoe vinden de pasgeboren schildpadjes de weg naar zee?",
+        opts:["Ze volgen hun moeder, die op hen wacht aan de waterlijn","Ze worden geleid door het maanlicht","Ze ruiken het zout van het zeewater","Ze horen het geluid van de golven"],
+        ans:1,
+        fb:"Juist! De tekst zegt duidelijk: 'geleid door het maanlicht'. De moeder is al lang terug in zee en kan dus niet op hen wachten."
+      },
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Informatieve tekst",
+        text:`Dieren in de woestijn leven zuinig met water. De kameel slaat water op in zijn lichaam en kan dagenlang zonder drinken. Kleine dieren zoals de woestijnmuis slapen overdag in hun hol en komen pas 's nachts naar buiten, als het koeler is. Zo verliezen ze minder vocht. Sommige planten, zoals de cactus, slaan water op in hun dikke stengels. De doornen van de cactus zorgen ervoor dat dieren het water niet kunnen stelen. Zo heeft elk dier en elke plant in de woestijn zijn eigen manier om te overleven.`,
+        q:"Waarom slapen woestijnmuizen overdag en komen ze pas 's nachts naar buiten?",
+        opts:["Ze zijn bang voor roofdieren die overdag actief zijn","Het is dan koeler, waardoor ze minder vocht verliezen","Ze zoeken voedsel dat alleen 's nachts beschikbaar is","Ze hebben last van het felle zonlicht"],
+        ans:1,
+        fb:"Goed! De tekst legt uit: 'als het koeler is... zo verliezen ze minder vocht.' Dat is de reden die in de tekst staat."
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Informatieve tekst — oorzaak en gevolg",
+        text:`Vroeger waren er in Nederland veel meer insecten. Wetenschappers hebben ontdekt dat het aantal insecten in Europa de afgelopen dertig jaar met meer dan 75 procent is gedaald. Dit heeft meerdere oorzaken. Ten eerste gebruiken boeren pesticiden om hun gewassen te beschermen, maar deze middelen doden ook nuttige insecten. Ten tweede zijn er door de groei van steden en akkers steeds minder bloemen en wilde planten. Insecten hebben die nodig als voedselbron. Ten slotte speelt klimaatverandering een rol: warmere en drogere zomers verstoren het ritme van insecten. Dit alles heeft gevolgen voor de hele natuur, want veel vogels en vleermuizen leven van insecten.`,
+        q:"Wat is het gevolg van het verdwijnen van insecten voor andere dieren, volgens de tekst?",
+        opts:[
+          "Boeren moeten meer pesticiden gebruiken omdat er minder insecten zijn",
+          "Vogels en vleermuizen komen in de problemen omdat insecten hun voedsel zijn",
+          "Klimaatverandering wordt erger doordat er minder insecten zijn",
+          "Wilde bloemen verdwijnen omdat insecten ze niet meer bestuiven"
+        ],
+        ans:1,
+        fb:"Correct! De tekst sluit af met: 'veel vogels en vleermuizen leven van insecten.' Dat is het directe gevolg. De andere antwoorden zijn óf oorzaken, óf niet in de tekst vermeld."
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Informatieve tekst — signaalwoorden",
+        text:`De blauwe vinvis is het grootste dier dat ooit op aarde heeft geleefd. Een volwassen blauwe vinvis kan wel 30 meter lang worden en 170.000 kilogram wegen. Ter vergelijking: dat is zwaarder dan dertig olifanten samen. Ondanks hun enorme omvang eten blauwe vinvissen bijna uitsluitend kleine kreeftjes, die <em>krill</em> worden genoemd. Per dag eet een blauwe vinvis wel 4.000 kilogram krill. Doordat mensen in de twintigste eeuw massaal walvissen jaagden, raakte de blauwe vinvis bijna uitgestorven. Tegenwoordig is de walvisjacht verboden in de meeste landen en nemen de aantallen langzaam toe.`,
+        q:"Wat betekent het signaalwoord 'Ondanks' in de zin 'Ondanks hun enorme omvang eten blauwe vinvissen bijna uitsluitend kleine kreeftjes'?",
+        opts:[
+          "Het geeft aan dat de grote omvang de reden is dat ze krill eten",
+          "Het geeft aan dat het verrassend is: je zou verwachten dat zulke grote dieren groter voedsel eten",
+          "Het geeft aan dat blauwe vinvissen ook andere dieren eten naast krill",
+          "Het geeft aan dat de omvang van de vinvis afhangt van wat hij eet"
+        ],
+        ans:1,
+        fb:"Goed gedaan! 'Ondanks' geeft een tegenstelling aan: iets wat je niet zou verwachten. Een zo groot dier leeft van zo kleine beestjes — dat is verrassend, en dat drukt 'ondanks' uit."
+      },
+      {
+        level:3, badge:"⭐⭐⭐ Niveau 3", bclass:"lv3", type:"Informatieve tekst — tussen de regels lezen",
+        text:`In Japan is er een bijzonder beroep: de <em>toji</em>, de meester-brouwer van sake. Een toji besteedt zijn hele leven aan de perfecte brouwmethode. Hij leert van zijn leermeester, net zoals die dat van zijn leermeester deed. De kennis wordt nooit opgeschreven, maar van persoon op persoon doorgegeven. Toch zijn er tegenwoordig steeds minder jonge mensen die dit beroep willen leren. Moderne jonge Japanners trekken naar de stad voor andere banen. Sommige oude toji's zijn bang dat hun kennis verloren zal gaan — kennis die al eeuwenlang bewaard is gebleven.`,
+        q:"Waarom is de kennis van de toji extra kwetsbaar vergeleken met veel andere beroepen?",
+        opts:[
+          "Omdat sake steeds minder populair wordt in Japan",
+          "Omdat de kennis nooit opgeschreven is en alleen mondeling wordt doorgegeven",
+          "Omdat de leerlingen te weinig betaald krijgen voor hun werk",
+          "Omdat het brouwen van sake te moeilijk is voor jonge mensen"
+        ],
+        ans:1,
+        fb:"Uitstekend! De tekst zegt dat de kennis 'nooit opgeschreven' wordt. Als er geen opvolgers meer zijn, verdwijnt die kennis voorgoed. Dat moet je zelf redeneren — het staat niet letterlijk in de tekst."
+      },
+      {
+        level:4, badge:"⭐⭐⭐⭐ Niveau 4", bclass:"lv4", type:"Meningtekst — schrijversdoel herkennen",
+        text:`Plastic tasjes zijn handig, goedkoop en licht. Toch zijn ze een van de grootste milieuproblemen van onze tijd. Elk jaar belanden miljoenen tasjes in de oceaan, waar ze langzaam afbreken in kleine stukjes — zogenaamd <em>microplastic</em>. Vissen en zeevogels eten deze deeltjes, en zo komen ze uiteindelijk ook in ons eigen voedsel terecht. Sommige landen hebben het gebruik van wegwerpplastic al verboden. Anderen beweren dat andere oplossingen, zoals betere afvalverwerking, handiger zijn. Maar kan een probleem dat we zelf hebben gecreëerd echt worden opgelost door het gewoon beter op te ruimen?`,
+        q:"Welk doel heeft de schrijver van deze tekst waarschijnlijk?",
+        opts:[
+          "Uitleggen hoe microplastic wordt gemaakt in fabrieken",
+          "De lezer informeren én overtuigen dat een verbod op plastic noodzakelijk is",
+          "Laten zien dat vissen en zeevogels niet bang hoeven te zijn voor plastic",
+          "Beide standpunten eerlijk en neutraal naast elkaar zetten zonder voorkeur"
+        ],
+        ans:1,
+        fb:"Heel goed! De schrijver geeft wel beide kanten, maar de slotvraag — 'kan het echt worden opgelost door het beter op te ruimen?' — verraadt zijn standpunt. Hij wil de lezer overtuigen, niet alleen informeren."
+      }
+    ]
+  },
+  {
+    id: "maatschappij",
+    label: "Set 2",
+    title: "Maatschappij & nieuws",
+    desc: "Elektrische auto's, schooltijden en meer",
+    vragen: 6,
+    questions: [
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Nieuwstekst",
+        text:`In Nederland worden steeds meer elektrische auto's gekocht. Toch rijden de meeste mensen nog in een auto op benzine of diesel. Het opladen van een elektrische auto duurt veel langer dan het tanken van benzine: soms wel een uur. Daar staat tegenover dat elektrisch rijden goedkoper is per kilometer en minder schadelijk is voor het milieu. De overheid stimuleert de verkoop van elektrische auto's door ze goedkoper te maken via belastingvoordelen. Critici zeggen dat de elektriciteit waarmee auto's worden opgeladen, zelf ook nog deels uit vervuilende kolencentrales komt.`,
+        q:"Wat is het belangrijkste nadeel van elektrische auto's dat in de tekst wordt genoemd?",
+        opts:["Ze zijn duurder in aanschaf dan benzineauto's","Opladen duurt veel langer dan tanken","Ze zijn niet geschikt voor lange ritten","Ze zijn moeilijker te repareren"],
+        ans:1,
+        fb:"Goed! De tekst noemt meerdere punten, maar het opladen — tot wel een uur — wordt als concreet nadeel tegenover het voordeel van goedkoper rijden gezet."
+      },
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Meningtekst",
+        text:`De bibliotheek in het dorp zou worden gesloten. Veel kinderen waren boos. Ze maakten spandoeken en stonden voor het gebouw. 'Boeken zijn voor iedereen,' stond op één van de spandoeken. De burgemeester zag de kinderen en beloofde de bibliotheek open te houden. 'Jullie hebben me overtuigd,' zei hij. 'Een bibliotheek is geen luxe, maar een noodzaak.' De kinderen juichten. Ze hadden bewezen dat gewone mensen het verschil kunnen maken als ze samenwerken.`,
+        q:"Wat bewezen de kinderen volgens de laatste zin?",
+        opts:[
+          "Dat bibliotheken te duur zijn om te sluiten",
+          "Dat gewone mensen verschil kunnen maken als ze samenwerken",
+          "Dat de burgemeester niet naar kinderen luistert",
+          "Dat spandoeken het beste protestmiddel zijn"
+        ],
+        ans:1,
+        fb:"Juist! De laatste zin zegt dit heel duidelijk. Dit hoef je niet uit te vinden — het staat letterlijk in de tekst."
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Meningtekst — hoofd- en bijzaken",
+        text:`Veel scholen beginnen steeds eerder met de dag. Kinderen moeten dan al om half acht aanwezig zijn. Voorstanders zeggen dat dit ouders helpt die vroeg moeten werken. Bovendien zouden kinderen dan meer uren onderwijs kunnen krijgen. Tegenstanders wijzen erop dat kinderen van 9 en 10 jaar nog veel slaap nodig hebben. Vroeg opstaan betekent minder nachtrust, en dat heeft gevolgen voor hun concentratie en leerprestaties. Onderzoek laat zien dat kinderen die voldoende slapen beter presteren op school. De vraag is dus: helpt een vroeg begin écht, of werkt het juist averechts?`,
+        q:"Wat is de hoofdvraag die de schrijver in deze tekst stelt?",
+        opts:[
+          "Moeten ouders vroeger naar hun werk?",
+          "Helpt eerder beginnen kinderen echt beter leren, of heeft het het tegenovergestelde effect?",
+          "Hoeveel uur slaap hebben kinderen van groep 6 nodig?",
+          "Wat vinden leerkrachten van vroeg beginnen op school?"
+        ],
+        ans:1,
+        fb:"Goed gedaan! De schrijver beschrijft beide kanten en stelt aan het einde de kernvraag: helpt een vroeg begin, of werkt het averechts? Dat is de hoofdgedachte van de tekst."
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Informatieve tekst — verwijswoorden",
+        text:`De olympische spelen worden elke vier jaar gehouden. Ze begonnen in het oude Griekenland, meer dan tweeduizend jaar geleden. Toen deden alleen vrije mannen uit Griekse steden mee aan de wedstrijden. In 1896 werden ze in Athene opnieuw gehouden, nu met atleten uit de hele wereld. Sindsdien zijn de spelen steeds groter geworden. Tegenwoordig doen meer dan tweehonderd landen mee en worden er honderden sporttakken beoefend. Het evenement duurt twee tot drie weken en wordt miljoenen mensen bekeken via televisie en internet.`,
+        q:"Waar verwijst het woord 'ze' naar in de zin 'In 1896 werden ze in Athene opnieuw gehouden'?",
+        opts:["De atleten uit de hele wereld","De olympische spelen","De Griekse steden","De wedstrijden van vrije mannen"],
+        ans:1,
+        fb:"Correct! Als je terugkijkt in de tekst, zie je dat de zin daarvoor over 'de olympische spelen' gaat. Het woord 'ze' verwijst terug naar dat onderwerp."
+      },
+      {
+        level:3, badge:"⭐⭐⭐ Niveau 3", bclass:"lv3", type:"Nieuwstekst — conclusies trekken",
+        text:`In veel steden worden steeds meer camera's opgehangen op straat. De politie zegt dat dit helpt om misdaad op te sporen en de veiligheid te vergroten. Tegenstanders vinden dat zoveel camera's een inbreuk zijn op de privacy van mensen. Zij vragen zich af wie de beelden bekijkt, hoe lang ze worden bewaard en wie er toegang toe heeft. Sommige onderzoekers stellen dat camera's misdaad niet voorkomen, maar alleen verplaatsen naar plekken zonder camera's. Toch stemmen steeds meer gemeenten in met uitbreiding van het cameranetwerk.`,
+        q:"Welke conclusie kun je trekken op basis van de laatste zin, in combinatie met de rest van de tekst?",
+        opts:[
+          "Gemeenten vinden veiligheid belangrijker dan de bezwaren over privacy en effectiviteit",
+          "Onderzoekers zijn het eens met de politie over de werking van camera's",
+          "Camera's zijn bewezen effectief in het verminderen van misdaad",
+          "Alle inwoners van steden zijn voor meer camera's op straat"
+        ],
+        ans:0,
+        fb:"Uitstekend! De tekst beschrijft bezwaren (privacy, verplaatsing van misdaad), maar gemeenten breiden het netwerk toch uit. Dat betekent dat ze veiligheid zwaarder laten wegen dan de bezwaren. Dit staat niet letterlijk in de tekst — je trekt een conclusie."
+      },
+      {
+        level:4, badge:"⭐⭐⭐⭐ Niveau 4", bclass:"lv4", type:"Meningtekst — toon en standpunt herkennen",
+        text:`Iedereen heeft tegenwoordig een smartphone. Of je nu in de trein zit, in een restaurant eet of gewoon op straat loopt — mensen staren naar hun scherm. Kinderen van zes jaar vragen al om een eigen telefoon. Is dit erg? Sommigen vinden van niet: de telefoon verbindt mensen, biedt toegang tot informatie en is onmisbaar in noodsituaties. Maar kijk eens om je heen: hoeveel echte gesprekken worden er nog gevoerd? Hoeveel mensen kijken hun kind echt aan als het iets vertelt? De telefoon is een geweldig hulpmiddel — maar we zijn vergeten dat hijzelf het baas is geworden.`,
+        q:"Wat is de toon van de schrijver in deze tekst?",
+        opts:[
+          "Enthousiast en positief over smartphones",
+          "Kritisch en bezorgd over de rol die smartphones spelen in ons leven",
+          "Neutraal en zakelijk, zonder eigen mening",
+          "Grappig en luchtig, niet serieus bedoeld"
+        ],
+        ans:1,
+        fb:"Heel goed! De schrijver noemt wel voordelen, maar de retorische vragen ('hoeveel echte gesprekken...') en de slotzin ('hij is zelf de baas geworden') laten zien dat hij bezorgd is. Het herkennen van toon is een gevorderde vaardigheid."
+      }
+    ]
+  },
+  {
+    id: "geschiedenis",
+    label: "Set 3",
+    title: "Geschiedenis & wetenschap",
+    desc: "Uitvindingen, ontdekkingen en het verleden",
+    vragen: 6,
+    questions: [
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Informatieve tekst",
+        text:`Vroeger dachten mensen dat de aarde plat was. Zeelieden waren bang dat ze aan het einde van de zee zouden vallen. Door reizen en waarnemingen — zoals de gebogen schaduw van de aarde op de maan tijdens een maansverduistering — begonnen geleerden te begrijpen dat de aarde rond moest zijn. De Griekse geleerde Eratosthenes berekende de omtrek van de aarde al meer dan tweeduizend jaar geleden, en hij zat er niet ver naast. Toch duurde het eeuwen voordat iedereen dit geloofde.`,
+        q:"Wat gebruikten geleerden als bewijs dat de aarde rond was?",
+        opts:[
+          "Ze voeren naar de rand van de aarde en keken omlaag",
+          "Ze zagen de gebogen schaduw van de aarde tijdens een maansverduistering",
+          "Ze maten de afstand van de aarde tot de zon",
+          "Ze ontdekten dat de zee blauw is"
+        ],
+        ans:1,
+        fb:"Juist! De tekst noemt de 'gebogen schaduw van de aarde op de maan tijdens een maansverduistering' als waarneming die geleerden op het goede idee bracht."
+      },
+      {
+        level:1, badge:"⭐ Niveau 1", bclass:"lv1", type:"Informatieve tekst",
+        text:`De uitvinding van de boekdrukkunst door Johannes Gutenberg rond 1450 veranderde de wereld. Vóór die tijd werden boeken met de hand geschreven door monniken. Dat kostte maanden werk per boek, waardoor boeken heel duur en zeldzaam waren. Met de drukpers konden in korte tijd honderden dezelfde boeken worden gemaakt. Hierdoor werden boeken goedkoper en konden meer mensen leren lezen. Kennis verspreidde zich sneller dan ooit tevoren. Sommige historici noemen Gutenbergs uitvinding de belangrijkste van het tweede millennium.`,
+        q:"Waarom waren boeken vóór de uitvinding van de drukpers zo duur en zeldzaam?",
+        opts:[
+          "Papier was heel moeilijk te maken in die tijd",
+          "Ze werden met de hand geschreven, wat maanden werk kostte per boek",
+          "Alleen rijke mensen mochten boeken bezitten",
+          "Er waren te weinig mensen die konden lezen"
+        ],
+        ans:1,
+        fb:"Goed! De tekst zegt dit duidelijk: boeken werden met de hand geschreven door monniken, en 'dat kostte maanden werk per boek.'"
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Informatieve tekst — oorzaak en gevolg",
+        text:`In 1347 bereikte de pest Europa vanuit Azië. De ziekte verspreidde zich razendsnel via ratten en vlooien in drukke steden. Mensen hadden geen idee hoe ze zich konden beschermen, want bacteriën waren nog niet ontdekt. Binnen een paar jaar stierf bijna een derde van de Europese bevolking. Dit had enorme gevolgen. Er waren zo weinig arbeiders over dat de lonen stegen: boeren konden voor het eerst eisen stellen aan hun heer. Ook begon men te twijfelen aan de macht van de kerk, want bidden leek de pest niet te stoppen. Zo droeg een verwoestende ziekte bij aan grote maatschappelijke veranderingen.`,
+        q:"Waardoor stegen de lonen van arbeiders na de pest?",
+        opts:[
+          "Omdat de kerk besloot dat arbeiders meer moesten verdienen",
+          "Omdat er zo weinig arbeiders over waren dat ze eisen konden stellen",
+          "Omdat de pest alleen rijke mensen trof",
+          "Omdat de handel met Azië na de pest toenam"
+        ],
+        ans:1,
+        fb:"Correct! De tekst legt het oorzaak-gevolgverband uit: doordat zoveel mensen stierven, waren er weinig arbeiders over, en daardoor konden ze eisen stellen — waardoor lonen stegen."
+      },
+      {
+        level:2, badge:"⭐⭐ Niveau 2", bclass:"lv2", type:"Informatieve tekst — samenvatten",
+        text:`Marie Curie was de eerste vrouw die een Nobelprijs won — en de eerste persoon ooit die er twee won. Ze ontdekte de elementen polonium en radium en deed baanbrekend onderzoek naar radioactiviteit. In haar tijd was het voor vrouwen bijna onmogelijk om aan een universiteit te studeren. Ze verhuisde daarvoor van Polen naar Parijs, waar ze in armoede leefde om te kunnen studeren. Haar ontdekkingen hebben de geneeskunde veranderd: radiotherapie, die vandaag nog wordt gebruikt bij de behandeling van kanker, is mede gebaseerd op haar werk.`,
+        q:"Wat is de beste samenvatting van deze tekst?",
+        opts:[
+          "Marie Curie was arm en moest naar Parijs verhuizen om te studeren",
+          "Marie Curie was een baanbrekende wetenschapper die ondanks grote hindernissen twee Nobelprijzen won en de geneeskunde veranderde",
+          "De Nobelprijs werd voor het eerst aan een vrouw gegeven door Marie Curie",
+          "Radioactiviteit is gevaarlijk, maar Marie Curie onderzocht het toch"
+        ],
+        ans:1,
+        fb:"Goed gedaan! Een samenvatting bevat de hoofdgedachte: wie ze was, wat ze bereikte én wat de impact was. Optie A is slechts een detail; optie B bevat alles wat er echt toe doet."
+      },
+      {
+        level:3, badge:"⭐⭐⭐ Niveau 3", bclass:"lv3", type:"Informatieve tekst — implicaties begrijpen",
+        text:`In de middeleeuwen hadden kaarten een heel andere functie dan nu. Ze waren geen nauwkeurige weergave van de werkelijkheid, maar gaven aan wat <em>belangrijk</em> was. Jeruzalem stond vaak in het midden van de kaart, ook al klopt dat geografisch niet. Onbekende gebieden werden gevuld met draken en zeemonsters. Kaarten waren bedoeld om de wereld te begrijpen zoals mensen die <em>dachten</em> dat die was — niet hoe die werkelijk was. Pas met de grote ontdekkingsreizen werden kaarten stap voor stap nauwkeuriger.`,
+        q:"Wat zegt de tekst indirect over hoe middeleeuwse mensen naar de wereld keken?",
+        opts:[
+          "Ze wisten precies hoe de wereld eruitzag maar tekenden het opzettelijk verkeerd",
+          "Hun wereldbeeld werd sterk bepaald door religie en angst voor het onbekende",
+          "Ze vonden kaarten niet nuttig en gebruikten ze zelden",
+          "Ze geloofden dat Jeruzalem het geografische middelpunt van de aarde was"
+        ],
+        ans:1,
+        fb:"Uitstekend! De tekst zegt dat kaarten 'aangaven wat belangrijk was' (Jeruzalem = religieus centrum) en het onbekende vulden met monsters (angst). Dat verraadt hoe mensen de wereld beleefden — dit staat niet letterlijk zo in de tekst."
+      },
+      {
+        level:4, badge:"⭐⭐⭐⭐ Niveau 4", bclass:"lv4", type:"Informatieve tekst — kritisch lezen",
+        text:`Een bekend experiment van Ivan Pavlov liet zien dat honden beginnen te kwijlen als ze een bel horen die vroeger altijd het voedsel aankondigde. Dit heet geconditioneerde reflex. Veel mensen denken dat dit bewijst dat gedrag volledig aangeleerd is. Maar wetenschappers zijn het daar niet over eens. Sommigen wijzen erop dat honden van nature al kwijlen bij voedsel — de bel is alleen een extra signaal geworden. Bovendien geldt een experiment met honden niet automatisch voor mensen. Gedrag van mensen wordt beïnvloed door veel meer factoren, zoals taal, cultuur en bewuste keuzes.`,
+        q:"Waarom is de conclusie 'gedrag is volledig aangeleerd' volgens de tekst te snel getrokken?",
+        opts:[
+          "Omdat Pavlov zijn experiment niet goed heeft uitgevoerd",
+          "Omdat het experiment alleen honden gebruikte en mensen veel complexer zijn, en de reflex deels al van nature aanwezig was",
+          "Omdat geconditioneerde reflexen alleen werken bij dieren, niet bij mensen",
+          "Omdat wetenschappers het experiment nooit hebben kunnen herhalen"
+        ],
+        ans:1,
+        fb:"Heel goed! De tekst geeft twee redenen: (1) kwijlen bij voedsel is al aangeboren — de bel is alleen een extra signaal; (2) mensen zijn complexer dan honden. Kritisch lezen betekent zien wanneer een conclusie verder gaat dan het bewijs toelaat."
+      }
+    ]
+  }
+];
+
+// ── State ──
+let currentSet = null;
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+// ── Render set cards ──
+function renderSetPicker() {
+  const grid = document.getElementById('set-grid');
+  grid.innerHTML = '';
+  SETS.forEach(set => {
+    const card = document.createElement('div');
+    card.className = 'set-card';
+    card.innerHTML = `
+      <div class="set-label">${set.label}</div>
+      <div class="set-title">${set.title}</div>
+      <div class="set-desc">${set.desc}</div>
+      <div class="set-meta">${set.vragen} vragen · AVI E6/M6</div>`;
+    card.addEventListener('click', () => startSet(set));
+    grid.appendChild(card);
+  });
+}
+
+// ── Start a set ──
+function startSet(set) {
+  currentSet = set;
+  currentQ = 0;
+  score = 0;
+  answered = false;
+  document.getElementById('set-picker').style.display = 'none';
+  const qa = document.getElementById('quiz-area');
+  qa.classList.add('visible');
+  renderQuestion();
+}
+
+// ── Render question ──
+function renderQuestion() {
+  const q = currentSet.questions[currentQ];
+  const total = currentSet.questions.length;
+  answered = false;
+
+  // Progress
+  document.getElementById('prog').style.width = (currentQ / total * 100) + '%';
+  document.getElementById('prog-label').textContent = currentQ + ' / ' + total;
+
+  const container = document.getElementById('qbody');
+  container.innerHTML = `
+    <div class="q-card">
+      <div class="q-header">
+        <span class="level-badge ${q.bclass}">${q.badge}</span>
+        <span class="type-label">${q.type}</span>
+      </div>
+      <div class="reading-text">${q.text}</div>
+      <div class="q-body">
+        <div class="question-text">${q.q}</div>
+        <div class="options" id="opts">
+          ${q.opts.map((o, i) => `
+            <button class="opt" onclick="pick(${i})">
+              <span class="opt-key">${String.fromCharCode(65+i)}</span>
+              <span>${o}</span>
+            </button>`).join('')}
+        </div>
+        <div class="feedback" id="fb"></div>
+        <div class="nav-row">
+          <span class="q-counter">Vraag ${currentQ + 1} van ${total}</span>
+          <button class="btn" id="nxt" onclick="next()">
+            ${currentQ + 1 < total ? 'Volgende vraag →' : 'Bekijk score →'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Pick answer ──
+function pick(i) {
+  if (answered) return;
+  answered = true;
+  const q = currentSet.questions[currentQ];
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === q.ans) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+  });
+  if (i === q.ans) score++;
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback show ' + (i === q.ans ? 'ok' : 'nok');
+  fb.innerHTML = `<span class="fb-icon">${i === q.ans ? '✓' : '✗'}</span> ${q.fb}`;
+  document.getElementById('nxt').classList.add('show');
+}
+
+// ── Next question ──
+function next() {
+  currentQ++;
+  if (currentQ >= currentSet.questions.length) {
+    showScore();
+  } else {
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ── Score screen ──
+function showScore() {
+  const total = currentSet.questions.length;
+  const pct = Math.round(score / total * 100);
+  const stars = score >= 5 ? '★★★' : score >= 3 ? '★★☆' : '★☆☆';
+  const msg = score === total ? 'Alle vragen goed — geweldig!' :
+              score >= 5 ? 'Uitstekend gedaan!' :
+              score >= 3 ? 'Goed geprobeerd! Lees de uitleg nog eens terug.' :
+              'Blijven oefenen — lees de feedbacks goed door!';
+
+  document.getElementById('prog').style.width = '100%';
+  document.getElementById('prog-label').textContent = total + ' / ' + total;
+
+  document.getElementById('qbody').innerHTML = `
+    <div class="score-screen">
+      <div class="stars">${stars}</div>
+      <div class="score-big">${score}/${total}</div>
+      <div class="score-sub">${pct}% goed</div>
+      <div class="score-msg">${msg}</div>
+      <div class="score-actions">
+        <button class="btn-score primary" onclick="restartSet()">Opnieuw proberen ↺</button>
+        <button class="btn-score secondary" onclick="backToMenu()">Andere set kiezen</button>
+      </div>
+    </div>`;
+}
+
+// ── Restart current set ──
+function restartSet() {
+  currentQ = 0;
+  score = 0;
+  answered = false;
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Back to menu ──
+function backToMenu() {
+  document.getElementById('quiz-area').classList.remove('visible');
+  document.getElementById('set-picker').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Init ──
+renderSetPicker();
+</script>
+</body>
+</html>
